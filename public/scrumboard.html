@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<!-- Usage: scrumboard.html?team=red&assignee=Avorathol -->
+<!-- Usage: scrumboard.html?team=blu&assignee=Beny13 -->
+
+<html>
+<head>
+    <meta http-equiv="Refresh" content="900">
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+    <title>Sprint</title>
+</head>
+
+<body>
+<style type="text/css">
+    body {
+        background-color: #313131;
+    }
+
+    .title {
+        text-align: center;
+        background-color: #009cb4;
+        color: white;
+    }
+
+    .status {
+        border: 1px black solid;
+        height: 100vh;
+        padding: 0;
+    }
+
+    * {
+        font-size: 12px;
+    }
+
+    .story_title {
+        padding: 5px;
+        overflow: hidden;
+        height: inherit;
+    }
+
+    .story_data {
+        border: 1px black solid;
+        text-align: center;
+    }
+
+    .story {
+        border: 1px black solid;
+        margin: 5px;
+        height: 50px;
+        background-color: #e8e8e8;
+    }
+
+    .assignee {
+        border: dashed red;
+    }
+
+    .commentee {
+        border: dashed deepskyblue;
+    }
+
+    .story_size {
+        background-color: white;
+        cursor: pointer;
+    }
+
+    .bonus .story_size {
+        background-color: yellow;
+    }
+
+    .story_data {
+        font-weight: bold;
+    }
+
+    .story_id {
+        background-color: #073d03;
+    }
+
+    .story_id a {
+        color: white;
+    }
+
+    .bug .story_id {
+        background-color: #44065e;
+    }
+
+    .story_id {
+        text-align: center;
+    }
+
+    .story_id > div {
+        padding: 0;
+    }
+
+    .red {
+        background-color: pink;
+    }
+
+    .green {
+        background-color: #cdff81;
+    }
+
+    .todesign {
+        background-color: #aaaaff;
+    }
+
+    .data {
+        margin-top: 3px;
+    }
+
+    .bug .story_id {
+        background-color: #490585;
+    }
+
+    .assignee-img {
+        margin: 0 3px;
+    }
+
+    .story_assignees {
+        display: none;
+        position: absolute;
+        width: 50px;
+        z-index: 200;
+        background-color: #e8e8e8;
+    }
+</style>
+<div class="container-fluid">
+    <div class="row">
+        <div class="col status" id="col_todo">
+            <div class="row title">
+                <div class="col-md-12">TODO</div>
+            </div>
+        </div>
+        <div class="col status" id="col_wip">
+            <div class="row title">
+                <div class="col-md-12">WIP</div>
+            </div>
+        </div>
+        <div class="col status" id="col_review">
+            <div class="row title">
+                <div class="col-md-12">REVIEW</div>
+            </div>
+        </div>
+        <div class="col status" id="col_testing">
+            <div class="row title">
+                <div class="col-md-12">TESTING</div>
+            </div>
+        </div>
+        <div class="col status" id="col_validating">
+            <div class="row title">
+                <div class="col-md-12">VALIDATING</div>
+            </div>
+        </div>
+        <div class="col status" id="col_done">
+            <div class="row title">
+                <div class="col-md-12">DONE</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript">
+  let token = 'REPLACE_ME';
+
+  let team = new URLSearchParams(window.location.search).get('team');
+  let assigneeUser = new URLSearchParams(window.location.search).get('assignee');
+
+  if (team !== 'blu') {
+    $('.title').css('background-color', '#fa3232');
+  }
+
+  let colTodo = $('#col_todo');
+  let colWip = $('#col_wip');
+  let colReview = $('#col_review');
+  let colTesting = $('#col_testing');
+  let colValidating = $('#col_validating');
+  let colDone = $('#col_done');
+
+  function insert(issue) {
+    let size = '?',
+      isBonux = false,
+      lightClass = '',
+      isOpen = issue.state === 'open',
+      isBug = false,
+      column = colTodo,
+      border = undefined
+    ;
+
+    issue.labels.forEach(function(label) {
+      let tag = label.name;
+      switch (tag) {
+        case '_To Design':
+          if (lightClass == '')
+            lightClass = 'todesign';
+          break;
+        case '** Green Light':
+          lightClass = 'green';
+          break;
+        case '** Red Light':
+          lightClass = 'red';
+          break;
+        case 'bonux':
+          isBonux = true;
+          break;
+        case 'bug':
+          isBug = true;
+          break;
+        case '_WIP':
+          column = colWip;
+          break;
+        case '_Review':
+          column = colReview;
+          break;
+        case '_Testing':
+          column = colTesting;
+          break;
+        case '_Validation':
+        case '_Done':
+          column = colValidating;
+          break;
+        default:
+          if (tag.startsWith('#'))
+            size = tag.slice(-2);
+      }
+    });
+
+    if (!isOpen)
+      column = colDone;
+
+    let assignees = '';
+
+    if (assigneeUser && issue.body.includes('@' + assigneeUser))
+      border = 'commentee';
+
+    issue.assignees.forEach(function(assignee) {
+      if (assigneeUser && assignee.login == assigneeUser)
+        border = 'assignee';
+
+      assignees += '<a href="' + assignee.html_url + '" target="_blank" class="assignee-img">' +
+        '<img width="18px" src="' + assignee.avatar_url + '" />' +
+        '</a>'
+    });
+
+    column.append(
+      '<div class="row story' + (isBonux ? ' bonus' : '') + ' ' + lightClass + ' ' + border + ' ' + (isBug ? 'bug' : '') + '">' +
+      '<div class="col-md-10 story_title">' +
+      '<span>' + issue.title + '</span>' +
+      '</div>' +
+      '<div class="col-md-2 data">' +
+      '<div class="row story_data story_size" onmouseover="showAssignees(this)" onmouseout="hideAssignees(this)">' +
+      '<div class="col-md-12"><span>' + size + '</span></div>' +
+      '</div>' +
+      '<div class="row story_data story_assignees">' +
+      assignees +
+      '</div>' +
+      '<div class="row story_data story_id">' +
+      '<div class="col-md-12"><a href="https://github.com/rgsystemes/kb/issues/' + issue.number + '" target="_blank">' +
+      '<span title="' + issue.body.replace(/"/g, '&quot;') + '">' + issue.number + '</span>' +
+      '</a></div>' +
+      '</div>' +
+      '</div>' +
+      '</div>'
+    );
+  }
+
+  function showAssignees(element) {
+    let assignees = getAssigneesDiv(element)
+
+    if (assignees)
+      assignees.style.display = 'block';
+  }
+
+  function hideAssignees(element) {
+    let assignees = getAssigneesDiv(element)
+
+    if (assignees)
+      assignees.style.display = 'none';
+  }
+
+  function getAssigneesDiv(el) {
+    let matchesFn;
+
+    // find vendor prefix
+    ['matches','webkitMatchesSelector','mozMatchesSelector','msMatchesSelector','oMatchesSelector'].some(function(fn) {
+      if (typeof document.body[fn] == 'function') {
+        matchesFn = fn;
+        return true;
+      }
+      return false;
+    });
+
+    let brotherhood = el.parentElement.children;
+
+    for (let i = 0; i < brotherhood.length; i++)
+      if (brotherhood[i][matchesFn]('.story_assignees'))
+        return brotherhood[i];
+
+    return undefined;
+  }
+
+  var request = new XMLHttpRequest()
+  request.open('GET', `./${team}.json`, false)
+  request.send(null)
+  var issues = JSON.parse(request.responseText).items
+
+  function getScore(div) {
+    return div.classList.contains('title') ? 0 :
+      div.classList.contains('green') ? 2 :
+        div.classList.contains('red') ? 3 :
+          div.classList.contains('bonus') ? 4 :
+            1
+      ;
+  }
+
+  issues.forEach(function(issue) {
+    insert(issue);
+  });
+
+  [colTodo, colWip, colReview, colTesting, colValidating, colDone].forEach(
+    function(col) {
+      col.append(col.children().sort(function(a, b) {
+        let aScore = getScore(a);
+        let bScore = getScore(b);
+        return (aScore < bScore) ? -1 : (aScore > bScore) ? 1 : 0;
+      }));
+    }
+  );
+</script>
+</body>
+
+</html>
