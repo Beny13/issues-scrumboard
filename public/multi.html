@@ -1,17 +1,21 @@
 <!DOCTYPE html>
 <!-- Don't forget to change the assignee below (REPLACE_ME) -->
 <html>
+    <head>
+        <script type="text/javascript">
+            document.addEventListener('DOMContentLoaded', event => {
+                const assigneeUser = new URLSearchParams(window.location.search).get('assignee');
+
+                if (assigneeUser) {
+                    [].forEach.call(document.getElementsByTagName('frame'), (frame, index) => {
+                        frame.src= frame.src + '&assignee=' + assigneeUser
+                    })
+                }
+            })
+        </script>
+    </head>
     <frameset rows="50%,50%">
         <frame src="index.html?team=blu" scrolling="no" />
         <frame src="index.html?team=red" scrolling="no" />
     </frameset>
-    <script type="text/javascript">
-        const assigneeUser = new URLSearchParams(window.location.search).get('assignee');
-
-        if (assigneeUser) {
-            [].forEach.call(document.getElementsByTagName('frame'), (frame, index) => {
-                frame.src= frame.src + '&assignee=' + assigneeUser
-            })
-        }
-    </script>
 </html>
