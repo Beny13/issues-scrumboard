@@ -185,6 +185,8 @@
       border = undefined
     ;
 
+    let warnings = []
+    let hasCategory = false
     issue.labels.forEach(function(label) {
       let tag = label.name;
       switch (tag) {
@@ -220,8 +222,14 @@
         default:
           if (tag.startsWith('#'))
             size = tag.slice(-2);
+
+          if (tag.startsWith('*'))
+            hasCategory = true
       }
     });
+
+    if (!hasCategory)
+      warnings.push('Missing category')
 
     if (!isOpen)
       column = colDone;
@@ -243,7 +251,7 @@
     column.append(
       '<div class="row story' + (isBonux ? ' bonus' : '') + ' ' + lightClass + ' ' + border + ' ' + (isBug ? 'bug' : '') + '">' +
       '<div class="col-md-10 story_title">' +
-      '<span>' + issue.title + '</span>' +
+      '<span title="' + warnings.join('\n') + '">' + (warnings.length ? '⚠' : '') + issue.title + '</span>' +
       '</div>' +
       '<div class="col-md-2 data">' +
       '<div class="row story_data story_size" onmouseover="showAssignees(this)" onmouseout="hideAssignees(this)">' +
@@ -297,10 +305,8 @@
     return undefined;
   }
 
-  var request = new XMLHttpRequest()
-  request.open('GET', `./${team}.json`, false)
-  request.send(null)
-  var issues = JSON.parse(request.responseText).items
+
+  issues = issues.items
 
   function getScore(div) {
     return div.classList.contains('title') ? 0 :
