@@ -305,8 +305,10 @@
     return undefined;
   }
 
-
-  issues = issues.items
+  var request = new XMLHttpRequest()
+  request.open('GET', `./${team}.json`, false)
+  request.send(null)
+  var issues = JSON.parse(request.responseText).items
 
   function getScore(div) {
     return div.classList.contains('title') ? 0 :
