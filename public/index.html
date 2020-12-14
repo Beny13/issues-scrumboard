@@ -222,9 +222,10 @@
         default:
           if (tag.startsWith('# '))
             size = tag.slice(-2);
-
-          if (tag.startsWith('* '))
+          else if (tag.startsWith('* '))
             hasCategory = true
+          else if (tag.startsWith('Need '))
+            warnings.push(tag);
       }
     });
 
