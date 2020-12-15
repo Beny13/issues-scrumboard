@@ -190,7 +190,7 @@
     issue.labels.forEach(function(label) {
       let tag = label.name;
       switch (tag) {
-        case '_To Design':
+        case '_ To Design':
           if (lightClass == '')
             lightClass = 'todesign';
           break;
@@ -206,25 +206,26 @@
         case 'bug':
           isBug = true;
           break;
-        case '_WIP':
+        case '_ WIP':
           column = colWip;
           break;
-        case '_Review':
+        case '_ Review':
           column = colReview;
           break;
-        case '_Testing':
+        case '_ Testing':
           column = colTesting;
           break;
-        case '_Validation':
-        case '_Done':
+        case '_ Validation':
+        case '_ Done':
           column = colValidating;
           break;
         default:
-          if (tag.startsWith('#'))
+          if (tag.startsWith('# '))
             size = tag.slice(-2);
-
-          if (tag.startsWith('*'))
+          else if (tag.startsWith('* '))
             hasCategory = true
+          else if (tag.startsWith('Need '))
+            warnings.push(tag);
       }
     });
 
