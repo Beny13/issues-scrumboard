@@ -53,11 +53,11 @@
     }
 
     .assignee {
-        border: dashed red;
+        border-left: solid red 5px;
     }
 
     .commentee {
-        border: dashed deepskyblue;
+        border-left: solid deepskyblue 5px;
     }
 
     .story_size {
@@ -219,6 +219,8 @@
         case '_ Done':
           column = colValidating;
           break;
+        case '_ Validated':
+          column = colDone;
         default:
           if (tag.startsWith('# '))
             size = tag.slice(-2);
