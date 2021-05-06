@@ -187,6 +187,7 @@
 
     let warnings = []
     let hasCategory = false
+    let isDevStory = false
     issue.labels.forEach(function(label) {
       let tag = label.name;
       switch (tag) {
@@ -222,6 +223,10 @@
           break;
         case '_ Validated':
           column = colDone;
+          break;
+        case '% Dev story':
+          isDevStory = true;
+          break;
         default:
           if (tag.startsWith('# '))
             size = tag.slice(-2);
@@ -232,7 +237,7 @@
       }
     });
 
-    if (!hasCategory)
+    if (isDevStory && !hasCategory)
       warnings.push('Missing category')
 
     if (!isOpen)
