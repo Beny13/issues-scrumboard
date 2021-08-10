@@ -185,6 +185,9 @@
       border = undefined
     ;
 
+    if (issue.body === undefined || issue.body === null)
+      issue.body = ''
+
     let warnings = []
     let hasCategory = false
     let isDevStory = false
