@@ -232,7 +232,7 @@
           break;
         default:
           if (tag.startsWith('# '))
-            size = tag.slice(-2);
+            size = tag.slice(2);
           else if (tag.startsWith('* '))
             hasCategory = true
           else if (tag.startsWith('Need '))
